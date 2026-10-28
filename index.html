@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>김주하 · BIM Portfolio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the page is an alignment. Concrete-grey survey sheet, a live wireframe tunnel in the hero,
+   projects placed at their start "station", properties tables in Revit's Parameter/Value grammar, one dark band for automation. */
+:root{
+  --bg:#e6e8e4; --surface:#f3f4f1; --ink:#111a1f; --muted:#5a6569; --line:#c4c9c3;
+  --accent:#ff4d17; --wire:#1d6b86; --band:#11191d; --band-ink:#e4ebe7; --band-muted:#8d9ca0; --band-line:#26343a;
+  --f-disp:"Archivo","Noto Sans KR",system-ui,sans-serif;
+  --f-kr:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1517; --surface:#161e21; --ink:#e2e8e4; --muted:#8b989b; --line:#2a3539;
+  --accent:#ff6a38; --wire:#5bc0dd; --band:#080c0e; --band-ink:#e2e8e4; --band-muted:#7f8e92; --band-line:#1d282c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1517; --surface:#161e21; --ink:#e2e8e4; --muted:#8b989b; --line:#2a3539;
+  --accent:#ff6a38; --wire:#5bc0dd; --band:#080c0e; --band-ink:#e2e8e4; --band-muted:#7f8e92; --band-line:#1d282c; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-kr);font-size:16px;line-height:1.7;word-break:keep-all}
+h1,h2,h3,h4{margin:0;text-wrap:balance;line-height:1.15}
+p{margin:0}
+.mono{font-family:var(--f-mono)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.label{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* top bar */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:20px;padding-block:12px}
+.bar .id{font-family:var(--f-disp);font-weight:800;font-stretch:125%;font-size:15px;letter-spacing:.02em;white-space:nowrap}
+.bar .id i{font-style:normal;color:var(--accent)}
+.bar nav{margin-left:auto;display:flex;gap:18px;overflow-x:auto;scrollbar-width:none}
+.bar nav a{color:var(--ink);text-decoration:none;font-size:14px;white-space:nowrap;opacity:.7}
+.bar nav a:hover{opacity:1}
+.sta-read{font-family:var(--f-mono);font-size:12px;color:var(--accent);white-space:nowrap;min-width:9.5em;text-align:right}
+
+/* hero */
+.hero .hero-in{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;align-items:center;padding-block:56px 40px}
+.hero h1{font-family:var(--f-kr);font-weight:900;font-size:clamp(56px,10vw,128px);letter-spacing:-.02em;line-height:1;margin:18px 0 22px}
+.hero h1 span{display:block;font-family:var(--f-disp);font-stretch:125%;font-weight:800;font-size:.34em;letter-spacing:.02em;color:var(--muted);margin-top:14px}
+.thesis{font-family:var(--f-kr);font-weight:700;font-size:clamp(22px,2.6vw,30px);line-height:1.35;max-width:18em}
+.thesis em{font-style:normal;color:var(--accent)}
+.hero .sub{color:var(--muted);max-width:34em;margin-top:16px}
+.viewport{position:relative;border:1px solid var(--line);background:var(--surface);aspect-ratio:4/3.2;max-width:100%}
+.viewport canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.vp-tl,.vp-br,.vp-bl{position:absolute;font-family:var(--f-mono);font-size:11px;color:var(--muted);pointer-events:none}
+.vp-tl{top:10px;left:12px}.vp-br{bottom:10px;right:12px;text-align:right}.vp-bl{bottom:10px;left:12px}
+.vp-tl b{color:var(--ink);font-weight:500}
+
+.spec{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.spec div{padding:20px 18px 18px 0}
+.spec div+div{padding-left:18px;border-left:1px solid var(--line)}
+.spec b{display:block;font-family:var(--f-disp);font-stretch:125%;font-weight:800;font-size:clamp(28px,3.6vw,44px);line-height:1;font-variant-numeric:tabular-nums}
+.spec b small{font-size:.45em;font-weight:600;color:var(--muted);margin-left:4px}
+.spec span{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
+.spec .hot b{color:var(--accent)}
+
+/* section heads */
+section{padding-block:96px 0;scroll-margin-top:56px}
+.sh{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:24px;align-items:end;margin-bottom:40px}
+.sh h2{font-family:var(--f-kr);font-weight:900;font-size:clamp(32px,5vw,56px);letter-spacing:-.02em}
+.sh p{color:var(--muted);max-width:36em;margin-top:12px}
+
+/* alignment */
+.align{position:relative;overflow-x:auto;padding-bottom:6px}
+.align-in{position:relative;min-width:820px;height:190px}
+.a-base{position:absolute;left:0;right:0;top:96px;height:1px;background:var(--ink)}
+.a-seg{position:absolute;top:90px;height:13px}
+.a-seg.mil{background:repeating-linear-gradient(90deg,var(--muted) 0 3px,transparent 3px 8px);height:3px;top:95px}
+.a-seg.arch{background:var(--ink)}
+.a-seg.civil{background:var(--accent)}
+.a-tick{position:absolute;top:84px;width:1px;height:26px;background:var(--ink)}
+.a-tl{position:absolute;top:116px;transform:translateX(-50%);}
+.a-tl.first{transform:none;}
+.a-tl{font-family:var(--f-mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.a-pin{position:absolute;top:126px;width:1px;height:18px;background:var(--line)}
+.a-pl{position:absolute;top:146px;font-size:12px;line-height:1.3;white-space:nowrap;color:var(--muted)}
+.a-name{position:absolute;top:18px;line-height:1.3}
+.a-name b{display:block;font-size:17px}
+.a-name small{font-size:13px;color:var(--muted)}
+
+/* projects */
+.proj{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:40px;padding-block:48px;border-top:1px solid var(--line);scroll-margin-top:56px}
+.proj .side{position:sticky;top:calc(80px + env(safe-area-inset-top,0px));align-self:start}
+.sta{font-family:var(--f-mono);font-size:13px;color:var(--accent);letter-spacing:.04em}
+.disc{display:inline-block;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;border:1px solid currentColor;padding:1px 7px;margin-left:8px;color:var(--muted)}
+.proj h3{font-weight:900;font-size:clamp(24px,2.8vw,32px);letter-spacing:-.01em;margin:10px 0 20px}
+.props{width:100%;border-collapse:collapse;font-size:14px}
+.props caption{text-align:left;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--muted);padding-bottom:6px}
+.props th,.props td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+.props th{width:84px;font-weight:500;color:var(--muted);background:var(--surface)}
+.props td{background:var(--bg)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills span{font-family:var(--f-mono);font-size:12px;padding:2px 8px;background:var(--ink);color:var(--bg)}
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.shots button{all:unset;display:block;cursor:zoom-in;position:relative;background:#fff;border:1px solid var(--line);overflow:hidden}
+.shots button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.shots button:first-child{grid-column:1 / -1}
+.shots img{display:block;width:100%;aspect-ratio:422/292;object-fit:cover;transition:transform .5s}
+.shots button:hover img{transform:scale(1.03)}
+.shots .cap{position:absolute;left:0;bottom:0;font-family:var(--f-mono);font-size:11px;background:var(--ink);color:var(--bg);padding:3px 8px}
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-top:28px}
+.notes h4{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--muted);font-weight:500;margin-bottom:10px;text-transform:uppercase}
+.notes ol{margin:0;padding:0;list-style:none;counter-reset:n}
+.notes ol li{counter-increment:n;display:grid;grid-template-columns:28px minmax(0,1fr);padding:6px 0;border-top:1px solid var(--line);font-size:15px}
+.notes ol li::before{content:counter(n,decimal-leading-zero);font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:4px}
+.notes ul{margin:0;padding:0;list-style:none}
+.notes ul li{padding:6px 0 6px 18px;border-top:1px solid var(--line);font-size:15px;position:relative}
+.notes ul li::before{content:"";position:absolute;left:0;top:16px;width:8px;height:2px;background:var(--accent)}
+.filters{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.filters button{font:inherit;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;padding:6px 12px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* automation band */
+.band{background:var(--band);color:var(--band-ink);margin-top:96px}
+.band section{padding-block:88px}
+.band .label,.band .sh p{color:var(--band-muted)}
+.band .sh h2 em{font-style:normal;color:var(--accent)}
+.race{display:grid;gap:22px;margin:8px 0 40px}
+.race .row{display:grid;grid-template-columns:150px minmax(0,1fr) 110px;gap:16px;align-items:center}
+.race .row span{font-size:14px;color:var(--band-muted)}
+.race .track{height:34px;background:repeating-linear-gradient(90deg,var(--band-line) 0 1px,transparent 1px 10%);position:relative}
+.race .fill{position:absolute;inset:0 auto 0 0;background:var(--band-muted)}
+.race .row.ai .fill{background:var(--accent);min-width:4px}
+.race b{font-family:var(--f-disp);font-stretch:125%;font-weight:800;font-size:26px;text-align:right;font-variant-numeric:tabular-nums}
+.race .row.ai b{color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){
+  .race .row:not(.ai) .fill{transform-origin:left;animation:grow 1.4s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes grow{from{transform:scaleX(.02)}}
+}
+.ai-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:40px}
+.ai-grid button{all:unset;cursor:zoom-in;display:block;border:1px solid var(--band-line);background:#fff;position:relative}
+.ai-grid img{display:block;width:100%;aspect-ratio:422/292;object-fit:cover}
+.ai-grid .cap{position:absolute;left:0;bottom:0;font-family:var(--f-mono);font-size:11px;background:var(--band);color:var(--band-ink);padding:3px 8px}
+.ai-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+.ai-cols h4{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--accent);font-weight:500;margin-bottom:10px}
+.ai-cols p,.ai-cols li{color:var(--band-ink);font-size:15px}
+.ai-cols ul{margin:0;padding-left:18px}
+.ai-cols p+p{margin-top:8px}
+.ai-cols .muted{color:var(--band-muted)}
+
+/* library */
+.lib{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.fam{background:var(--surface);padding:18px 18px 16px}
+.fam .cat{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.fam b{display:block;font-family:var(--f-disp);font-stretch:112%;font-weight:700;font-size:20px;margin:6px 0 12px}
+.fam .use{display:flex;gap:3px;align-items:center}
+.fam .use i{width:14px;height:6px;background:var(--line)}
+.fam .use i.on{background:var(--accent)}
+.fam .use small{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:8px}
+
+/* why */
+.why{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-top:1px solid var(--ink)}
+.why div{padding:22px 20px 0 0}
+.why div+div{padding-left:20px;border-left:1px solid var(--line)}
+.why h3{font-size:20px;font-weight:900;margin:8px 0 8px}
+.why p{color:var(--muted);font-size:15px}
+
+/* contact */
+footer{margin-top:120px;border-top:1px solid var(--ink)}
+footer .wrap{padding-block:56px 40px}
+.big-mail{font-family:var(--f-disp);font-stretch:118%;font-weight:800;font-size:clamp(28px,6.6vw,84px);letter-spacing:-.01em;line-height:1;overflow-wrap:anywhere;margin:18px 0 28px;user-select:all}
+.cgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;border-top:1px solid var(--line);padding-top:20px}
+.cgrid div{min-width:0}
+.cgrid dd{margin:4px 0 0;font-size:15px;overflow-wrap:anywhere}
+.cgrid button{font:inherit;font-family:var(--f-mono);font-size:11px;margin-top:8px;padding:3px 10px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.sign{margin-top:48px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:20;background:rgba(5,9,11,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+ padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lb img{max-width:min(1400px,100%);max-height:82vh;object-fit:contain;background:#fff}
+.lb p{font-family:var(--f-mono);font-size:12px;color:#cfd8d4}
+.lb button{position:absolute;top:max(14px,env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));font:inherit;font-family:var(--f-mono);font-size:12px;background:#fff;color:#111;border:0;padding:6px 12px;cursor:pointer}
+
+@media (max-width:980px){
+  .hero .hero-in{grid-template-columns:1fr}
+  .proj{grid-template-columns:1fr;gap:24px}
+  .proj .side{position:static}
+  .sh{grid-template-columns:1fr;gap:8px}
+  .lib{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .why{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .why div:nth-child(3){border-left:0;padding-left:0}
+  .ai-cols{grid-template-columns:1fr;gap:24px}
+  .cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .bar nav{display:none}
+  .vp-bl{display:none}
+  .spec{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .spec div:nth-child(3){border-left:0;padding-left:0}
+  .spec div:nth-child(n+3){border-top:1px solid var(--line)}
+  .shots,.notes,.ai-grid{grid-template-columns:1fr}
+  .lib{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .why,.cgrid{grid-template-columns:1fr}
+  .why div+div{border-left:0;padding-left:0;border-top:1px solid var(--line);margin-top:20px}
+  .race .row{grid-template-columns:1fr auto;gap:6px 12px}
+  .race .row span{grid-column:1 / -1}
+}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="id">KIM JUHA <i>/</i> BIM</div>
+    <nav aria-label="섹션 이동">
+      <a href="#path">경로</a><a href="#work">프로젝트</a><a href="#auto">자동화</a><a href="#library">툴</a><a href="#contact">연락처</a>
+    </nav>
+    <div class="sta-read" id="staRead" aria-hidden="true">STA 0+000</div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <div class="label">BIM Manager · Architecture × Civil</div>
+      <h1>김주하<span>KIM JUHA</span></h1>
+      <p class="thesis">도면을 읽고, 모델로 세우고,<br><em>반복은 자동화합니다.</em></p>
+      <p class="sub">건축 설계 2년 5개월, 토목 BIM 2년+.<br>고속도로·도시철도·철도 통합 모델 구축과 AI 기반 모델링 자동화.</p>
+    </div>
+    <div class="viewport" aria-label="회전하는 터널 와이어프레임 모델 그림">
+      <canvas id="tunnel"></canvas>
+      <div class="vp-tl"><b>{3D}</b> · Tunnel_Horseshoe.rfa</div>
+      <div class="vp-bl">3점매스 단면 × 선형</div>
+      <div class="vp-br" id="vpSta">STA 26+313.50</div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="spec">
+      <div><b>4<small>년+</small></b><span>총 경력 · 건축 2년 5개월 + 토목 BIM 2년+</span></div>
+      <div><b>6</b><span>참여 프로젝트 · 건축 3 · 토목 3</span></div>
+      <div><b>12</b><span>실무 활용 프로그램</span></div>
+      <div class="hot"><b>5h→5m</b><span>AI 자동화 · 터널 단면 모델링 (테스트)</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="path">
+  <div class="wrap">
+    <div class="sh"><div class="label">01 · Alignment</div><div><h2>경로</h2><p>병역을 마치고 건축 설계에서 시작해, 토목 BIM으로 넘어왔습니다. 선 위의 눈금은 측점처럼 연.월을 나타냅니다.</p></div></div>
+    <div class="align" role="img" aria-label="2020.03–2021.09 육군 병장 만기전역, 2021.10–2024.02 디엔비건축사사무소, 2024.04–현재 KCMC">
+      <div class="align-in" id="align"></div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="sh"><div class="label">02 · Structures</div><div><h2>프로젝트</h2><p>시작 시점 순서로 놓았습니다. 이미지를 누르면 크게 볼 수 있습니다.</p></div></div>
+    <div class="filters" role="group" aria-label="분야 필터">
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">ALL 6</button>
+      <button type="button" id="f-arch" data-f="arch" aria-pressed="false">ARCH 3</button>
+      <button type="button" id="f-civil" data-f="civil" aria-pressed="false">CIVIL 3</button>
+    </div>
+    <div id="projects"></div>
+  </div>
+</section>
+
+<div class="band">
+<section id="auto">
+  <div class="wrap">
+    <div class="sh"><div class="label">03 · Automation</div><div><h2>하루 걸리던 모델링을, <em>5분 안에.</em></h2><p>Dynamo로 터널을 만들기 전에 필요한 단면·3점매스 패밀리를 AI로 만든 Add-in이 자동으로 모델링하고 저장합니다.</p></div></div>
+    <div class="race" role="img" aria-label="수작업 약 5시간 대비 자동화 5분 미만, 막대 길이는 실제 비율">
+      <div class="row"><span>기존 수작업</span><div class="track"><div class="fill" style="width:100%"></div></div><b>≈300분</b></div>
+      <div class="row ai"><span>AI Add-in (테스트)</span><div class="track"><div class="fill" style="width:1.67%"></div></div><b>&lt;5분</b></div>
+    </div>
+    <div class="ai-grid" id="aiGrid"></div>
+    <div class="ai-cols">
+      <div><h4>WHAT</h4><ul><li>단면 패밀리 자동화</li><li>3점매스 패밀리 자동화</li><li>터널 Dynamo 제작</li><li>관련 모델링에 재사용 가능</li></ul></div>
+      <div><h4>EFFECT</h4><p>패턴별 단면과 3점매스 모델링에 최소 1~2일 걸리던 준비 작업을 몇 분에서 1시간 이내로 줄이는 것이 목표입니다.</p><p class="muted">현재 테스트 단계이며, 약 5시간 걸리던 작업이 5분 미만으로 단축된 결과를 얻었습니다.</p></div>
+      <div><h4>SHARE</h4><p>AI로 만든 Add-in과 AI 스킬을 팀원들과 공유하며 서로 다른 기술을 쌓고 있습니다.</p><p class="muted">터널 패밀리 외에 철근 배치, 정사영상 추출 자동화 기술도 보유하고 있습니다.</p></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="library">
+  <div class="wrap">
+    <div class="sh"><div class="label">04 · Family Library</div><div><h2>툴</h2><p>다룰 수 있는 툴의 종류입니다. 막대는 툴별 숙련도를 6단계로 나타냅니다.</p></div></div>
+    <div class="lib" id="lib"></div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="sh"><div class="label">05 · Why</div><div><h2>함께 일하면 좋은 이유</h2></div></div>
+    <div class="why">
+      <div><div class="label">ARCH + CIVIL</div><h3>건축과 토목을 모두</h3><p>건축 설계도면부터 교량·토공 BIM까지 직접 다뤄 봤습니다.</p></div>
+      <div><div class="label">AUTOMATION</div><h3>반복은 자동으로</h3><p>Dynamo, Assembly, AI Add-in으로 작업 시간을 줄입니다.</p></div>
+      <div><div class="label">TOOLS</div><h3>12개 툴 실무 운용</h3><p>모델링, 간섭검토, 수량산출, 영상과 보고서까지 이어집니다.</p></div>
+      <div><div class="label">DELIVERY</div><h3>기한 내 납품</h3><p>팀 협업으로 완성도 높은 결과물을 제때 냈습니다.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="label">06 · Contact</div>
+    <div class="big-mail" id="mail">kjhaaa1211@naver.com</div>
+    <dl class="cgrid">
+      <div><dt class="label">Email</dt><dd>kjhaaa1211@naver.com</dd><button type="button" data-copy="kjhaaa1211@naver.com">COPY</button></div>
+      <div><dt class="label">Phone</dt><dd>010-4276-4759</dd><button type="button" data-copy="010-4276-4759">COPY</button></div>
+      <div><dt class="label">Education</dt><dd>한양대학교 ERICA 건축IT융합 (2024.02 졸업)</dd></div>
+      <div><dt class="label">Location</dt><dd>경기도 의왕시 (안양시 인덕원역 부근)</dd></div>
+    </dl>
+    <div class="sign"><span>함께 일할 기회를 주신다면 최선을 다하겠습니다.</span><span>© 2026 김주하 · 육군 병장 만기전역</span></div>
+  </div>
+</footer>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="이미지 크게 보기">
+  <button type="button" id="lbX">CLOSE ✕</button><img id="lbI" alt=""><p id="lbC"></p>
+</div>
+
+<script>
+const P=[
+ {id:"yangcheon",f:"arch",sta:"2022.04",t:"서울양천우체국 복합청사 건립공사 설계용역",org:"디엔비건축사사무소",when:"2022.04–05, 2023.10–12",dur:"약 5개월",img:5,
+  caps:["3D 모델링 (Revit)","설계도면","BIM 결과 보고서"],order:[2,1,3],
+  roles:["CAD → Revit 3D 전환 설계 단독 담당","건축 분야 모델링","모델링 후 간섭검토로 설계 적합성 검토"],
+  learn:["전환설계를 혼자 맡아 부족한 부분을 스스로 메워 나갔습니다.","Revit 숙련도가 크게 오르고, 다루기 어려웠던 기능을 극복했습니다."],
+  tools:["Revit","AutoCAD","Illustrator","Navisworks"]},
+ {id:"godeok",f:"arch",sta:"2022.06",t:"(가칭)고덕4초등학교 신축공사 설계용역",org:"디엔비건축사사무소",when:"2022.06 – 2022.12",dur:"약 7개월",img:4,
+  caps:["SketchUp 모델","설계도면","관련 보고서 작성"],order:[2,1,3],
+  roles:["건축 설계도면 작성 및 수정","프로젝트 문서 납품 및 협의 자료 작성","보고서 삽도를 Illustrator로 작성"],
+  learn:["첫 프로젝트로 실무를 본격적으로 익혔습니다.","학교와 다른 결의 정보를 익히며 업무 처리 능력을 키웠습니다.","CAD와 관련 툴의 사용법을 새로 터득했습니다."],
+  tools:["AutoCAD","Illustrator","SketchUp"]},
+ {id:"geomdan",f:"arch",sta:"2023.08",t:"(가칭)검단6중학교 신축공사 설계용역",org:"디엔비건축사사무소",when:"2023.08 – 2024.02",dur:"약 7개월",img:6,
+  caps:["SketchUp 모델","설계도면","관련 보고서 작성"],order:[2,1,3],
+  roles:["건축 설계도면 작성 및 수정","프로젝트 문서 납품 및 협의 자료 작성","Illustrator로 시각 자료 제작"],
+  learn:["앞선 경험으로 더 짧은 시간에 높은 품질의 결과물을 납품했습니다.","협의·심의 자료로 쓰이며 긍정적인 피드백을 받았습니다.","팀원과 업무를 나눠 완성도를 함께 챙겼습니다."],
+  tools:["AutoCAD","Illustrator","SketchUp"]},
+ {id:"daesan",f:"civil",sta:"2024.04",t:"고속국도 30호선 대산~당진 건설공사 1공구",org:"KCMC",when:"2024.04 – 2024.11",dur:"약 8개월",img:7,
+  caps:["시공 시뮬레이션","교량 모델링","자동화 (Dynamo)"],order:[3,1,2],
+  roles:["고속도로 주변 가시설 및 주요 구조 모델링","Revit 구조 모델 완성","Dynamo로 단순 반복 작업 자동배치","다양한 자동화 방법 실험 및 적용"],
+  learn:["건축에서 토목으로 옮긴 첫 프로젝트입니다.","토목 전문 용어와 프로그램 기술을 익혔습니다.","처음 Dynamo 자동화를 도입해 작업 시간을 줄였습니다."],
+  tools:["Revit","Dynamo","AutoCAD","Navisworks"]},
+ {id:"daegu",f:"civil",sta:"2024.11",t:"대구 도시철도 4호선 1공구 건설공사",org:"KCMC",when:"2024.11 – 2025.02",dur:"약 4개월",img:8,
+  caps:["기존선과 간섭검토","동대구 고가도로 모델링","모델 속성정보 기입"],order:[3,1,2],
+  roles:["다양한 형태의 교량 구조 모델링","대규모 고가도로 Revit 모델링","Illustrator로 보고서 삽도 제작"],
+  learn:["대규모 교량 모델링으로 속도와 정확성이 크게 올랐습니다.","신설 구조물과 기존 정거장을 연계하며 현황 파악력과 정밀도를 높였습니다.","복잡한 조건에서도 고정밀 모델링을 할 수 있게 되었습니다."],
+  tools:["Revit","Dynamo","AutoCAD","Navisworks"]},
+ {id:"gwangju",f:"civil",sta:"2025.03",t:"광주송정~순천 철도건설 1공구 기본·실시설계",org:"KCMC",when:"2025.03 – 2026.04",dur:"약 13개월",scale:"대규모 T/K 철도 건설",img:9,
+  caps:["Civil 3D 토공 모델링","자동화 (Dynamo)","토공 수량산출"],order:[1,2,3],
+  roles:["Civil 3D로 토공(Assembly·표준횡단) 제작","InfraWorks로 주변 현황 구축 및 영상 제작","Navisworks 통합 모델 파일 제작","횡단면도·평면도 오류 검토 및 수량 파악"],
+  learn:["Civil 3D로 토공을 모델링했습니다.","Assembly 제작을 익히고, 모델링 이후 수량 산출까지 활용했습니다.","Navisworks·InfraWorks로 주변 현황과 통합 모델을 취합해 제출했습니다."],
+  tools:["Civil 3D","InfraWorks","AutoCAD","Navisworks"]}
+];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shot=(src,cap)=>`<button type="button" data-src="${src}" data-cap="${esc(cap)}" aria-label="${esc(cap)} 크게 보기"><img src="${src}" alt="${esc(cap)}" loading="lazy"><span class="cap">${esc(cap)}</span></button>`;
+
+document.getElementById("projects").innerHTML=P.map(p=>`
+<article class="proj" id="${p.id}" data-f="${p.f}">
+  <div class="side">
+    <div class="sta">STA ${p.sta}<span class="disc">${p.f==="arch"?"ARCH":"CIVIL"}</span></div>
+    <h3>${esc(p.t)}</h3>
+    <table class="props"><caption>PROPERTIES</caption><tbody>
+      <tr><th>소속</th><td>${p.org}</td></tr>
+      <tr><th>기간</th><td>${p.when}<br><span class="mono" style="font-size:12px;color:var(--muted)">${p.dur}</span></td></tr>
+      ${p.scale?`<tr><th>규모</th><td>${p.scale}</td></tr>`:""}
+      <tr><th>사용 툴</th><td><div class="pills">${p.tools.map(t=>`<span>${t}</span>`).join("")}</div></td></tr>
+    </tbody></table>
+  </div>
+  <div>
+    <div class="shots">${p.order.map((n,i)=>shot(`img/p${p.img}_${n}.jpg`,p.caps[i])).join("")}</div>
+    <div class="notes">
+      <div><h4>주요 역할</h4><ol>${p.roles.map(r=>`<li>${esc(r)}</li>`).join("")}</ol></div>
+      <div><h4>성과 &amp; 배운 점</h4><ul>${p.learn.map(r=>`<li>${esc(r)}</li>`).join("")}</ul></div>
+    </div>
+  </div>
+</article>`).join("");
+document.getElementById("aiGrid").innerHTML=[["AI로 자동화 개발",1],["3점매스 단면 패밀리 자동 모델링",2],["단면별 3점매스 자동 모델링·저장",3]].map(([c,n])=>shot(`img/p10_${n}.jpg`,c)).join("");
+
+/* filters */
+document.querySelectorAll(".filters button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  document.querySelectorAll(".proj").forEach(a=>a.hidden=!(b.dataset.f==="all"||a.dataset.f===b.dataset.f));
+}));
+
+/* family library: usage counted from project data */
+const LIB=[["Modeling","Revit",4],["Civil","Civil 3D",4],["Drafting","AutoCAD",4],["Coordination","Navisworks",4],["Infra","InfraWorks",4],["Automation","Dynamo",3],["Civil","Assembly",3],["Modeling","SketchUp",2],["Modeling","Rhino",1],["Visual","Illustrator",3],["Visual","Photoshop",2],["Visual","PowerPoint",4]];
+document.getElementById("lib").innerHTML=LIB.map(([c,n,k])=>`<div class="fam"><div class="cat">${c}</div><b>${n}</b>${k?`<div class="use" role="img" aria-label="숙련도 6단계 중 ${k}">${Array.from({length:6},(_,i)=>`<i class="${i<k?"on":""}"></i>`).join("")}<small>${k}/6</small></div>`:`<div class="use"><small style="margin-left:0">보유</small></div>`}</div>`).join("");
+
+/* alignment */
+(function(){
+  const t0=2020+2/12,t1=2026+10/12,el=document.getElementById("align");
+  const x=(y,m)=>((y+(m-1)/12-t0)/(t1-t0)*100);
+  let h='<div class="a-base"></div>';
+  [["mil",[2020,3],[2021,9],"육군 병역","병장 만기전역"],["arch",[2021,10],[2024,2],"디엔비건축사사무소","설계2본부 · 사원 · 2년 5개월"],["civil",[2024,4],[2026,10],"KCMC","BIM기술본부 · 매니저 · 재직 중"]]
+   .forEach(([c,a,b,n,s])=>{const l=x(...a),r=x(...b);h+=`<div class="a-seg ${c}" style="left:${l}%;width:${r-l}%"></div><div class="a-name" style="left:${l}%"><b>${n}</b><small>${s}</small></div>`});
+  [[2020,3],[2021,10],[2024,4]].forEach(([y,m],i)=>{const l=x(y,m);h+=`<div class="a-tick" style="left:${l}%"></div><div class="a-tl${i?"":" first"}" style="left:${l}%">${y}.${String(m).padStart(2,"0")}</div>`});
+  P.forEach(p=>{const [y,m]=p.sta.split(".").map(Number),l=x(y,m);h+=`<div class="a-pin" style="left:${l}%"></div>`});
+  [["2022–23 · 학교·청사 3건",x(2022,4)],["2024–26 · 도로·철도 3건",x(2024,4)]].forEach(([s,l])=>h+=`<div class="a-pl" style="left:${l}%">▲ ${s}</div>`);
+  el.innerHTML=h;
+})();
+
+/* station readout on scroll */
+(function(){
+  const r=document.getElementById("staRead");let q=false;
+  const up=()=>{q=false;const m=document.documentElement,f=Math.min(1,Math.max(0,scrollY/Math.max(1,m.scrollHeight-innerHeight)));
+    const v=f*6800;r.textContent="STA "+Math.floor(v/1000)+"+"+String(Math.floor(v%1000)).padStart(3,"0")};
+  addEventListener("scroll",()=>{if(!q){q=true;requestAnimationFrame(up)}},{passive:true});up();
+})();
+
+/* wireframe tunnel */
+(function(){
+  const cv=document.getElementById("tunnel"),ctx=cv.getContext("2d"),vp=document.getElementById("vpSta");
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let W=0,H=0,dpr=1;
+  const size=()=>{const r=cv.getBoundingClientRect();dpr=Math.min(2,devicePixelRatio||1);W=r.width;H=r.height;cv.width=W*dpr;cv.height=H*dpr};
+  size();addEventListener("resize",size);
+  // horseshoe section: arch + inverted invert
+  const sec=[];const R=1;
+  for(let i=0;i<=22;i++){const a=(-25+i*(230/22))*Math.PI/180;sec.push([Math.cos(a)*R,Math.sin(a)*R+.15])}
+  for(let i=1;i<8;i++){const t=i/8,a=(205+t*130)*Math.PI/180;sec.push([Math.cos(a)*1.25,Math.sin(a)*.38-.32])}
+  const N=34,L=8;
+  const C=s=>[ (s-.5)*L, 0, Math.sin(s*Math.PI*1.3)*1.4 ];
+  const T=s=>{const e=.001,a=C(s),b=C(s+e);const d=[b[0]-a[0],0,b[2]-a[2]],l=Math.hypot(d[0],d[2]);return [d[0]/l,0,d[2]/l]};
+  const fmt=(m,d)=>Math.floor(m/1000)+"+"+(m%1000).toFixed(d).padStart(d?6:3,"0");
+  const col=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  function frame(ts){
+    const t=(ts||0)/1000, yaw=reduce?.6:.6+Math.sin(t*.18)*.55, pitch=.42;
+    const wire=col("--wire"),acc=col("--accent"),mut=col("--line"),ink=col("--muted");
+    ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+    const sc=Math.min(W,H)*.135,cx=W*.53,cy=H*.56;
+    const proj=([x,y,z])=>{let X=x*Math.cos(yaw)-z*Math.sin(yaw),Z=x*Math.sin(yaw)+z*Math.cos(yaw);let Y=y*Math.cos(pitch)-Z*Math.sin(pitch);Z=y*Math.sin(pitch)+Z*Math.cos(pitch);const p=7/(7+Z*.35);return [cx+X*sc*p,cy-Y*sc*p,Z]};
+    // ground grid
+    ctx.lineWidth=1;ctx.strokeStyle=mut;ctx.globalAlpha=.9;
+    for(let g=-5;g<=5;g++){let a=proj([g,-.8,-4]),b=proj([g,-.8,4]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();a=proj([-5,-.8,g*.8]);b=proj([5,-.8,g*.8]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+    ctx.globalAlpha=1;
+    // rings
+    const grow=reduce?1:Math.min(1,((t*.22)%1.6));
+    const rings=[];
+    for(let i=0;i<=N;i++){const s=i/N;const c=C(s),tg=T(s),nx=-tg[2],nz=tg[0];
+      rings.push(sec.map(([u,v])=>proj([c[0]+nx*u,c[1]+v,c[2]+nz*u])))}
+    const shown=Math.max(1,Math.round(grow*N));
+    // longitudinals
+    ctx.strokeStyle=wire;ctx.globalAlpha=.55;
+    for(let k=0;k<sec.length;k+=3){ctx.beginPath();for(let i=0;i<=shown;i++){const p=rings[i][k];i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.stroke()}
+    ctx.globalAlpha=1;
+    for(let i=0;i<=shown;i++){const r=rings[i];ctx.strokeStyle=i===shown?acc:wire;ctx.lineWidth=i===shown?2:(i%5===0?1.2:.6);ctx.globalAlpha=i===shown?1:(i%5===0?.9:.45);ctx.beginPath();r.forEach((p,j)=>j?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.stroke()}
+    ctx.globalAlpha=1;
+    // centerline
+    ctx.setLineDash([6,4]);ctx.strokeStyle=acc;ctx.lineWidth=1;ctx.beginPath();
+    for(let i=0;i<=N;i++){const p=proj(C(i/N));i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.stroke();ctx.setLineDash([]);
+    // station labels
+    ctx.font="10px "+col("--f-mono");ctx.fillStyle=ink;
+    for(let i=0;i<=shown;i+=10){const p=proj([C(i/N)[0],1.45,C(i/N)[2]]);ctx.fillText(fmt(26313.5+i*25,0),p[0]-20,p[1])}
+    vp.textContent="STA "+fmt(26313.5+shown*25,2)+" · "+shown+"/"+N;
+    if(!reduce)requestAnimationFrame(frame);
+  }
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>reduce&&frame(0));
+  requestAnimationFrame(frame);
+})();
+
+/* lightbox */
+const lb=document.getElementById("lb"),lbI=document.getElementById("lbI"),lbC=document.getElementById("lbC");let last;
+document.addEventListener("click",e=>{const b=e.target.closest("[data-src]");if(!b)return;last=b;lbI.src=b.dataset.src;lbI.alt=b.dataset.cap;lbC.textContent=b.dataset.cap;lb.hidden=false;document.getElementById("lbX").focus()});
+const close=()=>{lb.hidden=true;last&&last.focus()};
+document.getElementById("lbX").addEventListener("click",close);
+lb.addEventListener("click",e=>{if(e.target===lb)close()});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!lb.hidden)close()});
+
+/* copy */
+document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>{
+  const done=()=>{b.textContent="COPIED";setTimeout(()=>b.textContent="COPY",1500)};
+  try{navigator.clipboard.writeText(b.dataset.copy).then(done,()=>{})}catch(e){}
+}));
+</script>
+</body>
+</html>
